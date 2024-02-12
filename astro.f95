@@ -90,8 +90,8 @@ module astro
         implicit none
         real(kind(1.d0)), intent(inout) :: a,e,m,i,w,ra ,ta
         real(kind(1.d0)), intent(out) :: x , y ,z 
-        real(kind(1.d0)) :: ecc_anomaly  , dE , ecc
-        integer :: b , n = 29 
+        real(kind(1.d0)) :: ecc_anomaly 
+        integer :: b 
         
         i = i*3.14159265358979323/180.0
         w = w*3.14159265358979323/180.0
@@ -117,16 +117,17 @@ module astro
 
 
     real function EccentricAnomaly(ta,e)
-        real(kind(1.d0)) , intent(in) :: ta , e 
-        
 
+        real(kind(1.d0)) , intent(in) :: ta , e 
         EccentricAnomaly = 2.0 * atan(tan(ta/2.0)/sqrt((e+1)/(1-e)))
         
         return
+        
     end function EccentricAnomaly
  
 
     real function MeanAnomaly(ta,e)
+
         real(kind(1.d0)) , intent(inout) :: ta , e 
         real(kind(1.d0)) :: ecc_anomaly 
 
@@ -182,9 +183,9 @@ module astro
     end function SemiMajorAxis
     
     real function SpecificAngularMomentum(k,ra,rp)
-        integer, parameter :: dp = kind(1.d0)
-        real(dp) :: sm,ecc
-        real(dp), intent(in) :: k, ra, rp
+
+        real(kind(1.d0)) :: sm,ecc
+        real(kind(1.d0)), intent(in) :: k, ra, rp
 
         sm = SemiMajorAxis(ra,rp)
         ecc = Eccentricity(ra,rp)
@@ -195,9 +196,9 @@ module astro
     end function SpecificAngularMomentum
 
     real function SpecificEnergy(k,ra,rp)
-        integer, parameter :: dp = kind(1.d0)
-        real(dp) :: sm
-        real(dp), intent(in) :: ra , rp ,k 
+
+        real(kind(1.d0)) :: sm
+        real(kind(1.d0)), intent(in) :: ra , rp ,k 
 
         sm = SemiMajorAxis(ra,rp)
 
@@ -206,9 +207,9 @@ module astro
     end function SpecificEnergy
 
     real function SemiLatusRectum(ra,rp)
-        integer, parameter :: dp = kind(1.d0)
-        real(dp),intent(in) :: ra,rp 
-        real(dp) :: sm , ecc
+
+        real(kind(1.d0)),intent(in) :: ra,rp 
+        real(kind(1.d0)) :: sm , ecc
 
         sm = SemiMajorAxis(ra,rp)
         ecc = Eccentricity(ra,rp)
@@ -219,9 +220,9 @@ module astro
     end function SemiLatusRectum
 
     real function Period(k,ra,rp)
-        integer, parameter :: dp = kind(1.d0)
-        real(dp) , intent(in) :: k ,ra , rp 
-        real(dp) :: sm , pi=3.14159265358979323_dp
+
+        real(kind(1.d0)) , intent(in) :: k ,ra , rp 
+        real(kind(1.d0)) :: sm , pi=3.14159265358979323_dp
 
         sm = SemiMajorAxis(ra,rp)
 
