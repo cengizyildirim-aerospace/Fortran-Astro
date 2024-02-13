@@ -1,8 +1,8 @@
 program orbit
     use astro
     implicit none 
-    integer, parameter :: dp = kind(1.d0)
-    real(dp) :: ra,rp,spcangmon , kSun , va0,vp0,ecc, T, kEarth, sm ,spe
+    
+    real(kind(1.d0)) :: ra,rp,spcangmon , kSun , va0,vp0,ecc, T, kEarth, sm ,spe
     
     call init_planets()
 
@@ -41,6 +41,9 @@ program orbit
 
     spe = SpecificEnergy(kEarth,ra,rp)
     write(*,"(a,f30.9,/)") "Here is the specific energy:" ,  spe
+
+
+
 
 
 
