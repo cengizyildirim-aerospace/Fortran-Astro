@@ -38,7 +38,7 @@ module astro
 
     ! ----------------------------------------------------------------------------------------------------------
     ! ----------------------------------------------------------------------------------------------------------
-    ! --------------------------------------  LEAP FROG IN 2D  -------------------------------------------------
+    ! --------------------------------------  LEAP FROG IN 2D (No Pertubations)  -------------------------------
     ! ----------------------------------------------------------------------------------------------------------
     ! ----------------------------------------------------------------------------------------------------------
 
@@ -99,6 +99,79 @@ module astro
 
         return
     end subroutine RLeapFrog2D  
+
+
+    ! ----------------------------------------------------------------------------------------------------------
+    ! ----------------------------------------------------------------------------------------------------------
+    ! --------------------------------------  LEAP FROG IN 3D (No Pertubations)  -------------------------------
+    ! ----------------------------------------------------------------------------------------------------------
+    ! ----------------------------------------------------------------------------------------------------------
+
+    subroutine LeapFrog3D(r_vector_xyz,v_vector_xyz,step,finalt,k,fr_vector,fv_vector)
+        implicit none 
+        integer , intent(in) :: finalt
+        real(kind(1.d0)), intent(in) :: step , k
+        real(kind(1.d0)), dimension(3), intent(inout) :: v_vector_xyz  , r_vector_xyz
+        real(kind(1.d0)), dimension(3), intent(out) :: fr_vector ,fv_vector
+        real(kind(1.d0)), dimension(3) :: a  
+        real(kind(1.d0)) :: r 
+
+
+        call dot_product3D(r_vector_xyz,r_vector_xyz,r)
+
+        r = sqrt(r)
+
+        a(1) = -k * r_vector_xyz(1)/(r**3)
+        a(2) = -k *r_vector_xyz(2)/(r**3)
+        a(3) = -k *r_vector_xyz(3)/(r**3)
+
+
+
+        fv_vector(1) = v_vector_xyz(1) + a(1)*step/real(2)
+        fv_vector(2) = v_vector_xyz(2) + a(2)*step/real(2)
+        fv_vector(3) = v_vector_xyz(3) + a(3)*step/real(2)
+
+        fr_vector(1) = r_vector_xyz(1) + fv_vector(1)*step 
+        fr_vector(2) = r_vector_xyz(2) + fv_vector(2)*step 
+        fr_vector(3) = r_vector_xyz(3) + fv_vector(3)*step       
+
+        return
+    end subroutine LeapFrog3D 
+
+
+    subroutine RLeapFrog3D(r_vector_xyz,v_vector_xyz,step,finalt,k,fr_vector,fv_vector)
+        implicit none 
+        integer , intent(in) :: finalt
+        real(kind(1.d0)), intent(in) :: step , k
+        real(kind(1.d0)), dimension(3), intent(inout) :: v_vector_xyz  , r_vector_xyz
+        real(kind(1.d0)), dimension(3), intent(out) :: fr_vector ,fv_vector
+        real(kind(1.d0)), dimension(3) :: a  
+        real(kind(1.d0)) :: r 
+
+
+        call dot_product3D(r_vector_xyz,r_vector_xyz,r)
+
+        r = sqrt(r)
+
+        a(1) = -k * r_vector_xyz(1)/(r**3)
+        a(2) = -k *r_vector_xyz(2)/(r**3)
+        a(3) = -k *r_vector_xyz(3)/(r**3)
+
+
+
+        fv_vector(1) = v_vector_xyz(1) + a(1)*step
+        fv_vector(2) = v_vector_xyz(2) + a(2)*step
+        fv_vector(3) = v_vector_xyz(3) + a(3)*step
+
+        fr_vector(1) = r_vector_xyz(1) + fv_vector(1)*step 
+        fr_vector(2) = r_vector_xyz(2) + fv_vector(2)*step 
+        fr_vector(3) = r_vector_xyz(3) + fv_vector(3)*step       
+
+        return
+    end subroutine RLeapFrog3D 
+
+
+
 
 
 

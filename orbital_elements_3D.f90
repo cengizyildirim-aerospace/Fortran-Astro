@@ -65,7 +65,7 @@
         write(*,"(a,f23.7,/)") "SemiMajorAxis : " , a 
         write(*,"(a,f23.7,/)") "Eccentricity : " , e 
 
-        write(*,*) " These elements could be used in NASA GMAT! " 
+        write(*,*) " These elements could be used in NASA GMAT! "
 
 
     end program orbital 
