@@ -39,7 +39,8 @@ program leap3d
 
     write (10, '(a)') "# Orbital Plot Example " 
     write (10, '(a)') "set title ""Molniya Orbit""" 
-    write (10,'(a,a)') "splot ""-"" notitle with dots ", "linewidth 2 linecolor 2"
+    write (10, '(a)')  "set view 30,30"
+    write (10, '(a)') "splot ""-"" notitle with dots linewidth 2 linecolor 2"
 
 
     call LeapFrog3D(r_vector_xyz,v_vector_xyz,step,finalt,gp,fr_vector,fv_vector)
