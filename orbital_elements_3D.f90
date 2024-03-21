@@ -2,8 +2,12 @@
         use astro 
         implicit none
         character(1) :: gm 
-        real(kind(1.d0)) :: raan , ta , i , w , a ,e  , k, gp ,h_total , p  
-        real(kind(1.d0)) , dimension(3) ::  r_vector_xyz , v_vector_xyz , h_vector, node_vector , e_vector 
+        real(kind(1.q0)) :: raan , ta , i , w , a ,e  , k, gp ,h_total , p  
+        real(kind(1.q0)) , dimension(3) ::  r_vector_xyz , v_vector_xyz , h_vector, node_vector , e_vector 
+
+        !------------------------------------------
+        ! This is from xyz to keplarian elements.
+        !------------------------------------------
 
         write(*,"(a)",advance="no") " Enter your r_vector as xyz and your v_vector as xyz : "
         read(*,*) r_vector_xyz , v_vector_xyz

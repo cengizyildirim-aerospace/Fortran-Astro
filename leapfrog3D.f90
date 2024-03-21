@@ -3,8 +3,8 @@ program leap3d
     use astro 
     implicit none 
     character(1) :: gm 
-    real(kind(1.d0)), dimension(3) :: r_vector_xyz , v_vector_xyz ,fr_vector,fv_vector
-    real(kind(1.d0)) :: gp , step
+    real(kind(1.q0)), dimension(3) :: r_vector_xyz , v_vector_xyz ,fr_vector,fv_vector
+    real(kind(1.q0)) :: gp , step
     integer :: fake_step,wr,i,finalt
 
 
