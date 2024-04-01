@@ -10,7 +10,8 @@ module astro
     end type planet
 
     type (planet) :: Earth , Moon, Sun ,Mercury, Mars, Jupiter, Saturn,Neptune,Venus,Uranus,Pluto, &
-    Io , Europa , Ganymede, Callisto, Mimas , Tethys, Dione , Rhea , Titan , Iapetus, Triton
+    Io , Europa , Ganymede, Callisto, Mimas , Tethys, Dione , Rhea , Titan , Iapetus, Triton, &
+    Titania , Oberon , Umbriel
     real(kind(1.q0)),parameter ::  pi = 3.14159265358979323846264338327950288q0
 
     
@@ -69,48 +70,60 @@ module astro
         Pluto%radius = 1188.3q3
 
         Io%k = 5.9599155q12
-        Io%mass = 8.9296488q22
+        Io%mass = 8.9296488q22 
         Io%radius = 1188.3q3
 
         Europa%k = 3.2027121q12
-        Europa%mass = 8.9296488q22
+        Europa%mass = 4.79857378q22
         Europa%radius = 1560.8q3
 
         Ganymede%k = 9.8878328q12
-        Ganymede%mass = 8.9296488q22
+        Ganymede%mass = 1.48147862q23
         Ganymede%radius = 2631.2q3
 
         Callisto%k = 7.1792834q12
-        Callisto%mass = 8.9296488q22
+        Callisto%mass = 1.07566087q23
         Callisto%radius = 2410.3q3
 
         Mimas%k = 2.503489q9
-        Mimas%mass = 8.9296488q22
+        Mimas%mass = 3.75q19
         Mimas%radius = 198.8q3 
 
         Tethys%k = 41.21q9
-        Tethys%mass = 8.9296488q22
+        Tethys%mass = 61.76q19
         Tethys%radius = 536.3q3 
   
         Dione%k = 73.116q9
-        Dione%mass = 8.9296488q22
+        Dione%mass = 109.572q19
         Dione%radius = 562.5q3 
 
         Rhea%k = 153.94q9
-        Rhea%mass = 8.9296488q22
+        Rhea%mass = 230.9q19
         Rhea%radius = 764.5q3  
 
         Titan%k = 8978.14q9
-        Titan%mass = 8.9296488q22
+        Titan%mass = 13455.3q19
         Titan%radius = 2575.5q3   
 
         Iapetus%k = 120.52q9
-        Iapetus%mass = 8.9296488q22
+        Iapetus%mass = 180.59q19
         Iapetus%radius = 734.5q3   
 
         Triton%k = 1428.495q9
-        Triton%mass = 8.9296488q22
+        Triton%mass = 2.14029186q22
         Triton%radius = 1352.6q3  
+
+        Titania%k = 226.9q9
+        Titania%mass = 35.27q20
+        Titania%radius = 788.9q3 
+
+        Oberon%k = 205.3q9
+        Oberon%mass = 30.14q20
+        Oberon%radius = 761.4q3
+
+        Umbriel%k = 85.1q9
+        Umbriel%mass = 11.72q20
+        Umbriel%radius = 584.7q3
 
 
         
@@ -673,11 +686,15 @@ module astro
 
     subroutine SpecificEnergyVR(r,v,k,e)
         implicit none 
-        real(kind(1.q0)) , dimension(3) , intent(in) :: r ,v 
+        real(kind(1.q0)) , dimension(3) , intent(inout) :: r ,v 
         real(kind(1.q0)) , intent(in) :: k 
-        real(kind(1.q0)) , intent(out) :: e
+        real(kind(1.q0)) , intent(out) :: e 
+        real(kind(1.q0)) :: vv ,rr 
 
-        e = v**2/2.0 - k / r 
+        call dot_product3D(v,v,vv)
+        call dot_product3D(r,r,rr)
+        rr = sqrt(rr)
+        e = vv/2.0 - k / rr 
 
         return 
     end subroutine SpecificEnergyVR

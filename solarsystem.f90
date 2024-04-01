@@ -2,18 +2,19 @@ program solar
     use astro 
 
     implicit none 
-
-    real(kind(1.q0)) :: rrr , step , vv 
-    real(kind(1.q0)), dimension(3)  :: relative_r  , rr , relative_v 
+    real(kind(1.q0)) :: rrr , step , vv , rr_orbit , rr_moon , p  , m , a , energy0, totale, test
+    real(kind(1.q0)), dimension(3)  :: relative_r  , rr , relative_v , vf , r_moon,v_moon, rf
+    
     type planets
         real(kind(1.q0)),dimension(3) ::  p , velocity , acc 
-        real(kind(1.q0)) :: gm 
+        real(kind(1.q0)) :: gm ,mass
         real(kind(1.q0)) :: energy 
     end type planets
 
-    type (planets),dimension(22) :: planett
+    type (planets),dimension(25) :: planett
 
-    integer(kind=16) :: i , j , t , k , wr 
+    integer(kind=16) :: i , j , t , k , wr , fake_step
+    integer :: finalt,day
 
     ! Lets start by giving the iniital conditions of the planets. Our "almost" intertial reference frame is the Solar System Berycenter
     ! This means the center of the Sun is NOT our center.
@@ -22,8 +23,9 @@ program solar
     call init_planets()
 
     
+    ! The position and the velocity of every planet on Feb 8, 2024.
 
-    planett(1)%p(1) = -1163537052.918776q0    
+    planett(1)%p(1) = -1163537052.918776q0     ! The sun 
     planett(1)%p(2) = -474006557.6137778q0
     planett(1)%p(3) = 31184526.41906473q0
  
@@ -33,7 +35,7 @@ program solar
 
 
 
-    planett(2)%p(1) = 1175745966.805013q0  
+    planett(2)%p(1) = 1175745966.805013q0   ! Mercury
     planett(2)%p(2) = -69420686926.57061q0
     planett(2)%p(3) = -5817764387.641165q0
 
@@ -43,7 +45,7 @@ program solar
 
 
 
-    planett(3)%p(1) = -43468546528.92029q0 
+    planett(3)%p(1) = -43468546528.92029q0 !Venus 
     planett(3)%p(2) =  -100396927559.6239q0
     planett(3)%p(3) =  1099930209.689982q0
 
@@ -53,8 +55,8 @@ program solar
 
 
 
-    planett(4)%p(1) =  -111448212050.9732q0    
-    planett(4)%p(2) =  97550914452.82833q0
+    planett(4)%p(1) =  -111448212050.9732q0     !the Earth
+    planett(4)%p(2) =  97550914452.82833q0 
     planett(4)%p(3) =  26778035.10279208q0
 
     planett(4)%velocity(1) = -20276.97054595732q0       
@@ -63,7 +65,7 @@ program solar
 
 
 
-    planett(5)%p(1) =  37018647652.25172q0 
+    planett(5)%p(1) =  37018647652.25172q0  ! Mars
     planett(5)%p(2) = -211703392121.9987q0 
     planett(5)%p(3) = -5332148864.790916q0
 
@@ -74,7 +76,7 @@ program solar
 
 
 
-    planett(6)%p(1) = 489401410294.7523q0  
+    planett(6)%p(1) = 489401410294.7523q0   ! Jupyter 
     planett(6)%p(2) = 562533468901.4261q0
     planett(6)%p(3) = -13283023128.02374q0
 
@@ -84,7 +86,7 @@ program solar
 
 
 
-    planett(7)%p(1) = 1354644048313.250q0  
+    planett(7)%p(1) = 1354644048313.250q0   ! Saturn 
     planett(7)%p(2) = -526994827771.3244q0
     planett(7)%p(3) = -44771791167.80645q0  
 
@@ -95,7 +97,7 @@ program solar
 
     
 
-    planett(8)%p(1) = 1816861070124.457q0   
+    planett(8)%p(1) = 1816861070124.457q0   !Uranus 
     planett(8)%p(2) = 2301334470958.584q0
     planett(8)%p(3) = -14990560295.87567q0
 
@@ -104,7 +106,7 @@ program solar
     planett(8)%velocity(3) =  84.18312321275012q0
 
 
-    planett(9)%p(1) =  4464172106275.985q0   
+    planett(9)%p(1) =  4464172106275.985q0   ! Neptune 
     planett(9)%p(2) = -250429368100.1182q0
     planett(9)%p(3) =  -97724357471.04323q0
 
@@ -114,7 +116,7 @@ program solar
 
 
 
-    planett(10)%p(1) = -1.113175726324003q11  
+    planett(10)%p(1) = -1.113175726324003q11   ! Moon
     planett(10)%p(2) = 9.721142863263611q10
     planett(10)%p(3) =  -5.449223300203681q6
 
@@ -122,7 +124,7 @@ program solar
     planett(10)%velocity(2) =  -2.195669409085904q4
     planett(10)%velocity(3) = 1.249049169100225q1
 
-    planett(11)%p(1) =  2.589356480215066q12  
+    planett(11)%p(1) =  2.589356480215066q12   ! Pluto
     planett(11)%p(2) = -4.534121953364584q12
     planett(11)%p(3) =  -2.638193356204123q11
 
@@ -227,6 +229,31 @@ program solar
     planett(22)%velocity(2) =  8.768002599697214q3
     planett(22)%velocity(3) =  5.890714089677549q2
 
+    planett(23)%p(1) =  1.816435517653067q12   ! Titania - Uranus   
+    planett(23)%p(2) = 2.301421392860621q12    
+    planett(23)%p(3) =  -1.503629005833972q10
+
+    planett(23)%velocity(1) = -5.673062370925212q3      
+    planett(23)%velocity(2) =  4.464290398957321q3
+    planett(23)%velocity(3) =  3.670204672685641q3
+
+    planett(24)%p(1) =  1.816491709929089q12   ! Oberon - Uranus   
+    planett(24)%p(2) = 2.301350657918233q12    
+    planett(24)%p(3) =  -1.544244438785636q10
+
+    planett(24)%velocity(1) = -7.742821176511318q3      
+    planett(24)%velocity(2) = 4.690449419677916q3
+    planett(24)%velocity(3) =  2.029995590424519q3
+    
+    planett(25)%p(1) =  1.816601921230485q12   ! Umbriel - Uranus   
+    planett(25)%p(2) = 2.301388401562102q12    
+    planett(25)%p(3) =  -1.500912503409970q10
+
+    planett(25)%velocity(1) = -5.569775018556443q3      
+    planett(25)%velocity(2) = 4.581402604313227q3
+    planett(25)%velocity(3) =  4.709885484103392q3
+
+
 
 
 
@@ -234,8 +261,32 @@ program solar
     
     ! -------------------------------------------------
 
-
-   
+    planett(1)%mass = Sun%mass
+    planett(2)%mass = Mercury%mass
+    planett(3)%mass = Venus%mass
+    planett(4)%mass = Earth%mass
+    planett(5)%mass = Mars%mass
+    planett(6)%mass = Jupiter%mass
+    planett(7)%mass = Saturn%mass
+    planett(8)%mass = Uranus%mass
+    planett(9)%mass = Neptune%mass
+    planett(10)%mass = Moon%mass
+    planett(11)%mass = Pluto%mass
+    planett(12)%mass = Io%mass
+    planett(13)%mass = Europa%mass
+    planett(14)%mass = Ganymede%mass
+    planett(15)%mass = Callisto%mass
+    planett(16)%mass = Mimas%mass
+    planett(17)%mass = Tethys%mass
+    planett(18)%mass = Dione%mass
+    planett(19)%mass = Rhea%mass
+    planett(20)%mass = Titan%mass
+    planett(21)%mass = Iapetus%mass
+    planett(22)%mass = Triton%mass
+    planett(23)%mass = Titania%mass
+    planett(24)%mass = Oberon%mass
+    planett(25)%mass = Umbriel%mass
+    
 
     !----------------------------------------------------
 
@@ -261,6 +312,12 @@ program solar
     planett(20)%gm = Titan%k
     planett(21)%gm = Iapetus%k
     planett(22)%gm = Triton%k
+    planett(23)%gm = Titania%k
+    planett(24)%gm = Oberon%k
+    planett(25)%gm = Umbriel%k
+    
+    
+
 
 
    
@@ -300,29 +357,23 @@ program solar
     open(20, file="PlutoPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    open(21, file="IoPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
+    open(22, file="WholeSystemEnergy.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    open(22, file="EarthEnergy.dat", action="write", position="rewind", status="replace", iostat=wr)
+    open(23, file="WholeSystemEnergyError.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    
 
 
-
-    print *, planett(10)%p - planett(4)%p
-
-    print *, planett(10)%velocity - planett(4)%velocity
-
-
-    
 
    
 
 
     !------------------------------------------------- 
 
-    write(*,*) " For how long should we predict the position of the planets? ( integer!) : " 
+    write(*,*) " For how long should we predict the position of the planets? ( seconds-integer!) : " 
+    write(*,*) " It should be a multiple of 86400 seconds (1 day)! " // & 
+    " Our code writes down the coordinates every 24 hours to save some time. "
     read(*,*) t 
 
     write(*,*) " Tell us the step size : " 
@@ -330,16 +381,25 @@ program solar
 
     t = int(t/step)
 
+    
+
+    energy0 = 0 
+    test = 0 
+
     do k = 1, t 
 
-        print *, k
-        do i = 1, 22
+        day = int(k*step)
+        if (mod(day,86400)== 0 ) then 
+            write(*,*) "day : " , int(day/86400.0) 
+        end if 
+
+        do i = 1, 25
             planett(i)%acc = 0 
         end do 
 
 
-        do i = 1,22
-            do j = 1 ,22
+        do i = 1,25
+            do j = 1 ,25
 
                 if (i == j )  then 
                     
@@ -373,7 +433,7 @@ program solar
 
         if (k == 1) then 
 
-            do i = 1,22
+            do i = 1,25
 
                 planett(i)%velocity(1) = planett(i)%velocity(1) + planett(i)%acc(1)*step/real(2)
                 planett(i)%velocity(2) = planett(i)%velocity(2) + planett(i)%acc(2)*step/real(2)
@@ -387,7 +447,7 @@ program solar
 
             
         else 
-            do i = 1,22
+            do i = 1,25
                 planett(i)%velocity(1) = planett(i)%velocity(1) + planett(i)%acc(1)*step
                 planett(i)%velocity(2) = planett(i)%velocity(2) + planett(i)%acc(2)*step
                 planett(i)%velocity(3) = planett(i)%velocity(3) + planett(i)%acc(3)*step
@@ -396,7 +456,8 @@ program solar
                 planett(i)%p(2) = planett(i)%p(2) + planett(i)%velocity(2)*step 
                 planett(i)%p(3) = planett(i)%p(3) + planett(i)%velocity(3)*step
 
-                if (mod(k,1000) == 0 .or. k == t) then 
+                if (mod(day,86400) == 0 .or. k == t) then 
+            
                     if (i == 1) then 
                         write(10,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
                     else if ( i == 2) then 
@@ -419,8 +480,6 @@ program solar
                         write(19,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
                     else if ( i == 11) then 
                         write(20,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 12) then 
-                        write(21,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
                     end if 
 
                 end if 
@@ -431,40 +490,125 @@ program solar
             end do 
         end if 
 
-         
+        
 
-        if (mod(k,1000)==0) then
-            planett(4)%energy = 0 
-            do j = 1,22
+        if (k>1 .and. mod(day,86400)== 0) then
+            do i = 1, 25 
+                planett(i)%energy = 0 
+            end do 
+
+            totale = 0 
+
+            do i = 1,25
+                do j = 1,25
+                    
+                    if (i ==j )  then 
+                            
+                        continue 
+                        
+                        
+                    else 
+                        relative_r = planett(i)%p - planett(j)%p 
+                        
+                        
+   
+                        call dot_product3D(relative_r,relative_r,rrr) 
+
+                        rrr = sqrt(abs(rrr))
+                    
+                        planett(i)%energy = planett(i)%energy  - planett(i)%mass*planett(j)%gm /(2.0*rrr )
+
+                        
+                        
+                            
+
+                            
+                    end if 
+
+                end do
+
+                call dot_product3D(planett(i)%velocity,planett(i)%velocity,vv) 
+                    
+                planett(i)%energy = planett(i)%energy + planett(i)%mass*(vv) /2.0 
+
                 
-                if (j == 4 )  then 
+
+            end do  
+
+
+            do i = 1, 25
+                totale = totale + planett(i)%energy  
+            end do 
+
+            if (abs((totale-energy0)/energy0)>test ) then 
+                test = abs((totale-energy0)/energy0)
+                write(22,"(i14,x,f60.20)") day, test
+
+            end if 
+
+             
+            write(23,"(i14,x,f60.20)") day, totale
+
+        else if (k==1) then
+            do i = 1, 25 
+                planett(i)%energy = 0 
+            end do 
+
+            do i = 1,25
+                do j = 1,25
+                    
+                    if (j == i )  then 
+                            
+                        continue 
                         
-                    continue 
-                    
-                    
-                else 
-                    relative_r = planett(4)%p - planett(j)%p 
-                    
-                    
-
-                    call dot_product3D(relative_r,relative_r,rrr) 
-
-                    rrr = sqrt(abs(rrr))
-
-                    call dot_product3D(planett(4)%velocity,planett(4)%velocity,vv) 
-                    planett(4)%energy = planett(4)%energy + (vv)**2 /2.0 - planett(j)%gm / rrr 
-
-                    
-
+                        
+                    else 
+                        relative_r = planett(i)%p - planett(j)%p 
+                        
                         
 
-                        
-                end if 
+                        call dot_product3D(relative_r,relative_r,rrr) 
 
-            end do
+                        rrr = sqrt(abs(rrr))
+                    
+                        planett(i)%energy = planett(i)%energy  - planett(i)%mass*planett(j)%gm /(2.0*rrr) 
+
+                        
+                        
+                            
+
+                            
+                    end if 
+
+                end do
+
+                call dot_product3D(planett(i)%velocity,planett(i)%velocity,vv) 
+                    
+                planett(i)%energy = planett(i)%energy + planett(i)%mass*(vv) /2.0 
+
+                
+
+            end do  
+
+
+            do i = 1, 25
+                energy0 = energy0 + planett(i)%energy  
+            end do  
+
             
-            write(22,"(i6,x,f30.6)") int(k/100.0 ),planett(4)%energy 
-        end if 
+
+            write(23,"(i14,x,f60.20)") day, energy0
+
+            
+        
+            
+
+            
+
+        end if  
+            
+       
+        
 
 
         
@@ -481,6 +625,22 @@ program solar
     write(*,"(a,f50.6)") " Vx Earth: " , planett(4)%velocity(1) 
     write(*,"(a,f50.6)") " Vy Earth: " , planett(4)%velocity(2)
     write(*,"(a,f50.6)") " Vz Earth : " , planett(4)%velocity(3)  
+
+    write(*,*)  "the largest relative energy non-conservation: " , energy0 
+
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+
 
 
 
@@ -499,8 +659,8 @@ program solar
     close(18)
     close(19)
     close(20)
-    close(21)
     close(22)
+    close(23)
 
 
 
