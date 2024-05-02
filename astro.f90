@@ -9,9 +9,11 @@ module astro
 
     end type planet
 
-    type (planet) :: Earth , Moon, Sun ,Mercury, Mars, Jupiter, Saturn,Neptune,Venus,Uranus,Pluto, &
-    Io , Europa , Ganymede, Callisto, Mimas , Tethys, Dione , Rhea , Titan , Iapetus, Triton, &
-    Titania , Oberon , Umbriel
+    type (planet) :: Earth , Moon, Sun ,Mercury, Mars, Jupiter, Saturn,Neptune,Venus,Uranus,Pluto
+    type(planet) :: Io , Europa , Ganymede, Callisto, Mimas , Tethys, Dione , Rhea , Titan , Iapetus, Triton
+    type(planet) :: Titania , Oberon , Umbriel, Jupiters, Saturns,Uranuss,Neptunes,Charon,Nix,Hydra,Plutos,Marss
+
+
     real(kind(1.q0)),parameter ::  pi = 3.14159265358979323846264338327950288q0
 
     
@@ -23,25 +25,25 @@ module astro
         ! Mean radius is used 
         ! k stands for gravitational parameter
 
-        Earth%k = 3.98600435436q14
+        Earth%k = 398600.435436q9
         Earth%radius = 6371.0084q3
         Earth%mass = 5.97217q24
 
         
-        Moon%k = 4.902800066q12
+        Moon%k = 4902.8005821478q9
         Moon%mass = 7.34578924831069q22
         Moon%radius = 1737.4q3
 
         
-        Sun%k = 1.3271244004193938q20
+        Sun%k = 132712440041.93938q9
         Sun%mass = 1.98840987131q30
         Sun%radius = 695700q3
 
-        Mercury%k = 2.2031868551q13
+        Mercury%k = 22031.86855q9
         Mercury%mass = 0.330103q24
         Mercury%radius = 2439.4q3
         
-        Venus%k = 3.24858592000q14
+        Venus%k = 324858.59882646q9
         Venus%mass = 4.86731q24
         Venus%radius =  6051.8q3
 
@@ -49,7 +51,7 @@ module astro
         Mars%mass = 0.64169q24
         Mars%radius = 3389.50q3
 
-        Jupiter%k = 1.26686531900q17
+        Jupiter%k = 1.26686531900q17      
         Jupiter%mass = 1898.125q24
         Jupiter%radius = 69911q3
 
@@ -65,7 +67,7 @@ module astro
         Neptune%mass = 102.4092q24
         Neptune%radius = 24622q3
 
-        Pluto%k = 8.6961q11 
+        Pluto%k = 869.326q9 
         Pluto%mass = 1.307q22
         Pluto%radius = 1188.3q3
 
@@ -122,11 +124,47 @@ module astro
         Oberon%radius = 761.4q3
 
         Umbriel%k = 85.1q9
-        Umbriel%mass = 11.72q20
+        Umbriel%mass = 11.72q20  
         Umbriel%radius = 584.7q3
 
+        Jupiters%k = 126712767.8578q9       ! Jupyter system! - not the planet's gravity
+        Jupiters%mass = 1898.125q24      ! - to be changed 
+        Jupiters%radius = 71492q3
 
+        Saturns%k = 37940626.061137q9   ! Saturn system! - not the planet's gravitational parameter
+        Saturns%mass= 568.317q24   ! - to be changed 
+        Saturns%radius = 60268q3 
+
+        Uranuss%k = 5794549.0070719q9 ! Uranus system! - not the planet's gravitational parameter
+        Uranuss%mass = 86.8099q24  ! - to be changed 
+        Uranuss%radius = 25559q3  
+
+        Neptunes%k = 6836534.0638793q9  ! Neptune system! - not the planet's gravitational parameter
+        Neptunes%mass = 102.4092q24  ! - to be changed
+        Neptunes%radius = 25269q3
+
+        Charon%k = 106.10q9  ! Pluto moon
+        Charon%mass = 102.4092q24   ! - to be changed
+        Charon%radius = 606q3
+
+        Nix%k = 0.001496q9  ! Pluto moon
+        Nix%mass = 102.4092q24   ! - to be changed
+        Nix%radius = 18q3 
+
+        Hydra%k = 0.00201q9  ! Pluto moon
+        Hydra%mass = 102.4092q24   ! - to be changed
+        Hydra%radius = 18.5q3  
         
+
+        Plutos%k = 981.600887707q9  ! Pluto System
+        Plutos%mass = 1.307q22
+        Plutos%radius = 1162q3
+
+        Marss%k = 42828.375816q9  ! Mars System
+        Marss%mass = 1.307q22 !to be changed
+        Marss%radius = 1162q3 !to be changed 
+
+
     end subroutine init_planets
 
 
