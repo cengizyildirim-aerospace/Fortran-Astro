@@ -12,7 +12,7 @@ module astro
     type (planet) :: Earth , Moon, Sun ,Mercury, Mars, Jupiter, Saturn,Neptune,Venus,Uranus,Pluto
     type(planet) :: Io , Europa , Ganymede, Callisto, Mimas , Tethys, Dione , Rhea , Titan , Iapetus, Triton
     type(planet) :: Titania , Oberon , Umbriel, Jupiters, Saturns,Uranuss,Neptunes,Charon,Nix,Hydra,Plutos,Marss
-
+    type(planet) :: Earths
 
     real(kind(1.q0)),parameter ::  pi = 3.14159265358979323846264338327950288q0
 
@@ -128,19 +128,19 @@ module astro
         Umbriel%radius = 584.7q3
 
         Jupiters%k = 126712767.8578q9       ! Jupyter system! - not the planet's gravity
-        Jupiters%mass = 1898.125q24      ! - to be changed 
+        Jupiters%mass = 1898.51771q24      
         Jupiters%radius = 71492q3
 
         Saturns%k = 37940626.061137q9   ! Saturn system! - not the planet's gravitational parameter
-        Saturns%mass= 568.317q24   ! - to be changed 
+        Saturns%mass= 568.458505q24   
         Saturns%radius = 60268q3 
 
         Uranuss%k = 5794549.0070719q9 ! Uranus system! - not the planet's gravitational parameter
-        Uranuss%mass = 86.8099q24  ! - to be changed 
+        Uranuss%mass = 86.8188275q24  
         Uranuss%radius = 25559q3  
 
         Neptunes%k = 6836534.0638793q9  ! Neptune system! - not the planet's gravitational parameter
-        Neptunes%mass = 102.4092q24  ! - to be changed
+        Neptunes%mass = 102.430727q24  ! 
         Neptunes%radius = 25269q3
 
         Charon%k = 106.10q9  ! Pluto moon
@@ -157,13 +157,16 @@ module astro
         
 
         Plutos%k = 981.600887707q9  ! Pluto System
-        Plutos%mass = 1.307q22
+        Plutos%mass = 1.47071736q22
         Plutos%radius = 1162q3
 
         Marss%k = 42828.375816q9  ! Mars System
-        Marss%mass = 1.307q22 !to be changed
+        Marss%mass = 64.1690901q22 
         Marss%radius = 1162q3 !to be changed 
 
+        Earths%k = 403503.236018148q9 !EMB system
+        Earths%radius = 6371.0084q3  !to be changed 
+        Earths%mass = 604.562789248311q22
 
     end subroutine init_planets
 

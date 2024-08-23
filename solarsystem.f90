@@ -3,19 +3,20 @@ program solar
 
     implicit none 
     real(kind(1.q0)) :: rrr , step , vv , rr_orbit , rr_moon , p  , m , a , energy0, totale, test,test1
-    real(kind(1.q0)), dimension(3)  :: relative_r  , rr , relative_v , vf , r_moon,v_moon, rf
+    real(kind(1.q0)), dimension(3)  :: relative_r  , rr , relative_v , vf , rf , ang 
+    real(kind(1.q0)) :: total_angular_momentum, angular_momentum0, res_ang, ang_diff
     
     type planets
         real(kind(1.q0)),dimension(3) ::  p , velocity , acc 
         real(kind(1.q0)) :: gm ,mass
-        real(kind(1.q0)) :: energy , v  ! v stand for the total velocity of the object!
-        character(15) :: name 
+        real(kind(1.q0)) :: energy , v , angular_momentum , rel ! v stand for the total velocity of the object!
+        character(25) :: name 
     end type planets
 
     type (planets),dimension(25) :: planett
 
-    integer(kind=16) :: i , j , t , k , wr , fake_step
-    integer(kind=16) :: finalt,day
+    integer(kind=16) :: i , j , t , k , wr , fake_step,d
+    integer(kind=16) :: finalt,day,f, ff , control 
 
     ! Lets start by giving the iniital conditions of the planets. Our "almost" intertial reference frame is the Solar System Berycenter
     ! This means the center of the Sun is NOT our center.
@@ -57,14 +58,14 @@ program solar
     planett(3)%velocity(3) = -2.036812982080393q3
 
 
-    planett(4)%name = "The Earth"
-    planett(4)%p(1) =  -1.114482120509732q11     !the Earth
-    planett(4)%p(2) =  9.755091445282833q10 
-    planett(4)%p(3) =  2.677803510279208q7
+    planett(4)%name = "The Earth-Moon Barycenter"
+    planett(4)%p(1) =  -1.114466247056924q11     !the Earth Barycenter
+    planett(4)%p(2) =  9.754678950171889q10 
+    planett(4)%p(3) = 2.638645507973433q7
 
-    planett(4)%velocity(1) = -2.027697054595732q4       
-    planett(4)%velocity(2) = -2.239420902641540q4 
-    planett(4)%velocity(3) =  1.132016626611332q0
+    planett(4)%velocity(1) = -2.026499985540712q4       
+    planett(4)%velocity(2) = -2.238889296426649q4 
+    planett(4)%velocity(3) =  1.270028736488626q0
 
 
     planett(5)%name = "Mars System"
@@ -119,25 +120,14 @@ program solar
     planett(9)%velocity(3) = -1.186052963155491q2
 
 
-    planett(10)%name = "The Moon"
-    planett(10)%p(1) = -1.113175726324003q11   ! Moon
-    planett(10)%p(2) = 9.721142863263611q10
-    planett(10)%p(3) =  -5.449223300203681q6
+    planett(10)%name = "Pluto System"
+    planett(10)%p(1) =   2.589355494906734q12   ! Pluto barycenter
+    planett(10)%p(2) = -4.534120993663620q12
+    planett(10)%p(3) = -2.638172950988719q11
 
-    planett(10)%velocity(1) = -1.929177591167254q4      
-    planett(10)%velocity(2) =  -2.195669409085904q4
-    planett(10)%velocity(3) = 1.249049169100225q1
-
-
-
-    planett(11)%name = "Pluto System"
-    planett(11)%p(1) =   2.589355494906734q12   ! Pluto barycenter
-    planett(11)%p(2) = -4.534120993663620q12
-    planett(11)%p(3) = -2.638172950988719q11
-
-    planett(11)%velocity(1) = 4.861058210676243q3      
-    planett(11)%velocity(2) = 1.502368640131439q3
-    planett(11)%velocity(3) = -1.566868320916638q3
+    planett(10)%velocity(1) = 4.861058210676243q3      
+    planett(10)%velocity(2) = 1.502368640131439q3
+    planett(10)%velocity(3) = -1.566868320916638q3
 
     
 
@@ -153,14 +143,13 @@ program solar
     planett(1)%mass = Sun%mass
     planett(2)%mass = Mercury%mass
     planett(3)%mass = Venus%mass
-    planett(4)%mass = Earth%mass
+    planett(4)%mass = Earths%mass
     planett(5)%mass = Marss%mass
     planett(6)%mass = Jupiters%mass
     planett(7)%mass = Saturns%mass
     planett(8)%mass = Uranuss%mass
     planett(9)%mass = Neptunes%mass
-    planett(10)%mass = Moon%mass
-    planett(11)%mass = Plutos%mass
+    planett(10)%mass = Plutos%mass
     
     
 
@@ -169,14 +158,13 @@ program solar
     planett(1)%gm = Sun%k
     planett(2)%gm = Mercury%k 
     planett(3)%gm = Venus%k
-    planett(4)%gm = Earth%k 
+    planett(4)%gm = Earths%k 
     planett(5)%gm = Marss%k 
-    planett(6)%gm = Jupiter%k
+    planett(6)%gm = Jupiters%k
     planett(7)%gm = Saturns%k 
     planett(8)%gm = Uranuss%k
     planett(9)%gm = Neptunes%k
-    planett(10)%gm = Moon%k
-    planett(11)%gm = Plutos%k
+    planett(10)%gm = Plutos%k
   
     
 
@@ -198,7 +186,7 @@ program solar
     open(12, file="VenusPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    open(13, file="EarthPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
+    open(13, file="Earth-MoonPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
     open(14, file="MarsPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
@@ -216,20 +204,18 @@ program solar
     open(18, file="NeptunePosition.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    open(19, file="MoonPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
+    open(19, file="PlutoPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
-    open(20, file="PlutoPosition.dat", action="write", position="rewind", status="replace", iostat=wr)
-    if (wr == 0) write(*, *) "Success!"
-
-    open(22, file="WholeSystemEnergyChange.dat", action="write", position="rewind", status="replace", iostat=wr)
+    open(22, file="WholeSystemEnergyBiggestChange.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
     open(23, file="WholeSystemEnergy.dat", action="write", position="rewind", status="replace", iostat=wr)
     if (wr == 0) write(*, *) "Success!"
 
 
-
+    open(24, file="WholeSystemAngularMomentum.dat", action="write", position="rewind", status="replace", iostat=wr)
+    if (wr == 0) write(*, *) "Success!"
 
    
 
@@ -244,17 +230,23 @@ program solar
     write(*,*) " Tell us the step size : " 
     read(*,*) step 
 
-    t = int(t/step)
-
+    d = int(t/step, kind=16)
+    
     
 
+    angular_momentum0 = 0
     energy0 = 0 
     test = 0 
+    ff = 0 
+    total_angular_momentum = 0 
 
-    do k = 1, t 
+    do k = 1, d 
 
-        day = int(k*step)
-        
+        day = int(k*step, kind=16)
+
+    
+        f = int(day/(86400.0), kind=16) 
+ 
 
         if (day == 0) then 
             day = 1 
@@ -262,20 +254,20 @@ program solar
         
 
         if (mod(day,86400)== 0 .and. day /= 0) then 
-            write(*,*) "day : " , int(day/86400.0) 
+            write(*,*) "day : " , f   
         end if 
 
-        do i = 1, 11
+        do i = 1, 10
             planett(i)%acc = 0 
         end do 
 
 
-        do i = 1,11
-            do j = 1 ,11
+        do i = 1,10
+            do j = 1 ,10
 
                 if (i == j )  then 
                     
-                    continue 
+                    cycle 
                 
                 
                 else 
@@ -305,11 +297,11 @@ program solar
 
         if (k == 1) then 
 
-            do i = 1,11
+            do i = 1,10
 
-                planett(i)%velocity(1) = planett(i)%velocity(1) + planett(i)%acc(1)*step/real(2)
-                planett(i)%velocity(2) = planett(i)%velocity(2) + planett(i)%acc(2)*step/real(2)
-                planett(i)%velocity(3) = planett(i)%velocity(3) + planett(i)%acc(3)*step/real(2)
+                planett(i)%velocity(1) = planett(i)%velocity(1) + planett(i)%acc(1)*step/2.0
+                planett(i)%velocity(2) = planett(i)%velocity(2) + planett(i)%acc(2)*step/2.0
+                planett(i)%velocity(3) = planett(i)%velocity(3) + planett(i)%acc(3)*step/2.0
 
                 planett(i)%p(1) = planett(i)%p(1) + planett(i)%velocity(1)*step 
                 planett(i)%p(2) = planett(i)%p(2) + planett(i)%velocity(2)*step 
@@ -319,7 +311,7 @@ program solar
 
             
         else 
-            do i = 1,11
+            do i = 1,10
                 planett(i)%velocity(1) = planett(i)%velocity(1) + planett(i)%acc(1)*step
                 planett(i)%velocity(2) = planett(i)%velocity(2) + planett(i)%acc(2)*step
                 planett(i)%velocity(3) = planett(i)%velocity(3) + planett(i)%acc(3)*step
@@ -328,30 +320,28 @@ program solar
                 planett(i)%p(2) = planett(i)%p(2) + planett(i)%velocity(2)*step 
                 planett(i)%p(3) = planett(i)%p(3) + planett(i)%velocity(3)*step
 
-                if (mod(day,86400) == 0 .or. k == t) then 
+                if (mod(day,86400)== 0 .or. k == t) then 
             
-                    if (i == 1) then 
+                    if (i == 1 ) then 
                         write(10,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 2) then 
+                    else if ( i == 2 ) then 
                         write(11,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 3) then 
+                    else if ( i == 3 ) then 
                         write(12,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 4) then 
+                    else if ( i == 4 ) then 
                         write(13,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 5) then 
+                    else if ( i == 5 ) then 
                         write(14,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 6) then 
+                    else if ( i == 6 ) then 
                         write(15,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 7) then 
+                    else if ( i == 7 ) then 
                         write(16,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 8) then 
+                    else if ( i == 8 ) then 
                         write(17,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 9) then 
+                    else if ( i == 9 ) then 
                         write(18,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 10) then 
+                    else if ( i == 10 ) then 
                         write(19,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
-                    else if ( i == 11) then 
-                        write(20,"(f30.6,x,f30.6,x,f30.6)") planett(i)%p(1),planett(i)%p(2),planett(i)%p(3)
                     end if 
 
                 end if 
@@ -365,14 +355,16 @@ program solar
         
 
         if (k>1 .and. mod(k,360)== 0) then
-            do i = 1, 11 
+            do i = 1, 10 
                 planett(i)%energy = 0 
+                planett(i)%angular_momentum = 0 
             end do 
 
             totale = 0 
+            total_angular_momentum = 0 
 
-            do i = 1,11
-                do j = 1,11
+            do i = 1,10
+                do j = 1,10
                     
                     if (i ==j )  then 
                             
@@ -391,8 +383,7 @@ program solar
                         planett(i)%energy = planett(i)%energy  - planett(i)%mass*planett(j)%gm /(2.0*rrr )
 
                         
-                        
-                            
+
 
                             
                     end if 
@@ -401,16 +392,30 @@ program solar
 
                 call dot_product3D(planett(i)%velocity,planett(i)%velocity,vv) 
                     
-                planett(i)%energy = planett(i)%energy + planett(i)%mass*(vv) /2.0 
+                planett(i)%energy = planett(i)%energy + planett(i)%mass*(vv) /2.0
+
+
+                call cross_product3D(planett(i)%p,planett(i)%velocity,ang)
+                call dot_product3D(ang,ang,res_ang)
+                
+                res_ang = sqrt(res_ang)
+
+                planett(i)%angular_momentum = res_ang
+                            
 
                 
 
             end do  
 
 
-            do i = 1, 11
-                totale = totale + planett(i)%energy  
+            do i = 1, 10
+                totale = totale + planett(i)%energy 
+                total_angular_momentum = total_angular_momentum + planett(i)%angular_momentum 
             end do 
+
+            ang_diff = (angular_momentum0-total_angular_momentum)/(angular_momentum0)
+            write(24,"(i14,x,f80.20)") day, ang_diff
+
 
             if (abs((totale-energy0)/energy0)>test ) then 
                 test = abs((totale-energy0)/energy0)
@@ -418,16 +423,17 @@ program solar
 
             end if 
 
-            test1 = abs((totale-energy0)/energy0) 
+            test1 = (totale-energy0)/energy0
             write(23,"(i14,x,f60.20)") day, test1
 
         else if (k==1) then
-            do i = 1, 11 
-                planett(i)%energy = 0 
+            do i = 1, 10 
+                planett(i)%energy = 0
+                planett(i)%angular_momentum = 0 
             end do 
 
-            do i = 1,11
-                do j = 1,11
+            do i = 1,10
+                do j = 1,10
                     
                     if (j == i )  then 
                             
@@ -458,13 +464,19 @@ program solar
                     
                 planett(i)%energy = planett(i)%energy + planett(i)%mass*(vv) /2.0 
 
+                call cross_product3D(planett(i)%p,planett(i)%velocity,ang)
+                call dot_product3D(ang,ang,res_ang)
                 
+                res_ang = sqrt(res_ang)
+
+                planett(i)%angular_momentum = res_ang
 
             end do  
 
 
-            do i = 1,11
+            do i = 1,10
                 energy0 = energy0 + planett(i)%energy  
+                angular_momentum0 = angular_momentum0 + planett(i)%angular_momentum
             end do  
 
             
@@ -490,19 +502,21 @@ program solar
 
 
     
-    write(*,"(a,f50.6)") " The position of the Earth is x: " , planett(4)%p(1) 
-    write(*,"(a,f50.6)") " The position of the Earth is y: " , planett(4)%p(2)
-    write(*,"(a,f50.6)") " The position of the Earth is z: " , planett(4)%p(3)  
+    write(*,"(a,f50.6,a)") " The position of the Earth is x: " , planett(4)%p(1) ,"(m/s)"
+    write(*,"(a,f50.6,a)") " The position of the Earth is y: " , planett(4)%p(2) ,"(m/s)"
+    write(*,"(a,f50.6,a)") " The position of the Earth is z: " , planett(4)%p(3) ,"(m/s)"
 
     write(*,"(a,f50.6)") " Vx Earth: " , planett(4)%velocity(1) 
     write(*,"(a,f50.6)") " Vy Earth: " , planett(4)%velocity(2)
     write(*,"(a,f50.6)") " Vz Earth : " , planett(4)%velocity(3)
 
 
-    do i = 1, 11 
+    do i = 1, 10
         call dot_product3D(planett(i)%velocity,planett(i)%velocity,planett(i)%v) 
         planett(i)%v = sqrt(planett(i)%v)
-        write(*,"(a,a,f50.6)") " V of " , planett(i)%name, planett(i)%v
+
+        write(*,"(a,a,f60.6,a)") " V of " , planett(i)%name, planett(i)%v, " (m/s)"
+     
     end do 
     
      
@@ -537,10 +551,9 @@ program solar
     close(17)
     close(18)
     close(19)
-    close(20)
     close(22)
     close(23)
-
+    close(24)
 
 
 
