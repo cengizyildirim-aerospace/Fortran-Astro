@@ -4,7 +4,7 @@ program solar
     implicit none 
     real(kind(1.q0)) :: rrr , step , vv , rr_orbit , rr_moon , p  , m , a , energy0, totale, test,test1
     real(kind(1.q0)), dimension(3)  :: relative_r  , rr , relative_v , vf , rf , ang 
-    real(kind(1.q0)) :: total_angular_momentum, angular_momentum0, res_ang, ang_diff, d 
+    real(kind(1.q0)) :: total_angular_momentum, angular_momentum0, res_ang, ang_diff
     
     type planets
         real(kind(1.q0)),dimension(3) ::  p , velocity , acc 
@@ -15,8 +15,8 @@ program solar
 
     type (planets),dimension(25) :: planett
 
-    integer(kind=16) :: i , j , t , k , wr , fake_step
-    integer(kind=16) :: finalt,day,f, ff , control , count 
+    integer(kind=16) :: i , j , t , k , wr , fake_step,d
+    integer(kind=16) :: finalt,day,f, ff , control 
 
     ! Lets start by giving the iniital conditions of the planets. Our "almost" intertial reference frame is the Solar System Berycenter
     ! This means the center of the Sun is NOT our center.
@@ -230,29 +230,22 @@ program solar
     write(*,*) " Tell us the step size : " 
     read(*,*) step 
 
-    d = t/step
+    d = int(t/step, kind=16)
     
-
+    
 
     angular_momentum0 = 0
     energy0 = 0 
     test = 0 
     ff = 0 
     total_angular_momentum = 0 
-    count = 0 
 
-    do while (count < d) 
+    do k = 1, d 
 
-        count = count + 1 
+        day = int(k*step, kind=16)
 
-        day = int(count*step, kind=16)
-
-        print *, count 
-     
     
         f = int(day/(86400.0), kind=16) 
-
-
  
 
         if (day == 0) then 
@@ -302,7 +295,7 @@ program solar
 
         
 
-        if (count == 1) then 
+        if (k == 1) then 
 
             do i = 1,10
 
@@ -361,7 +354,7 @@ program solar
 
         
 
-        if (count>1 .and. mod(count,360)== 0) then
+        if (k>1 .and. mod(k,360)== 0) then
             do i = 1, 10 
                 planett(i)%energy = 0 
                 planett(i)%angular_momentum = 0 
@@ -433,7 +426,7 @@ program solar
             test1 = (totale-energy0)/energy0
             write(23,"(i14,x,f60.20)") day, test1
 
-        else if (count==1) then
+        else if (k==1) then
             do i = 1, 10 
                 planett(i)%energy = 0
                 planett(i)%angular_momentum = 0 
@@ -509,9 +502,9 @@ program solar
 
 
     
-    write(*,"(a,f50.6,a)") " The position of the Earth is x: " , planett(4)%p(1) ,"(m)"
-    write(*,"(a,f50.6,a)") " The position of the Earth is y: " , planett(4)%p(2) ,"(m)"
-    write(*,"(a,f50.6,a)") " The position of the Earth is z: " , planett(4)%p(3) ,"(m)"
+    write(*,"(a,f50.6,a)") " The position of the Earth is x: " , planett(4)%p(1) ,"(m/s)"
+    write(*,"(a,f50.6,a)") " The position of the Earth is y: " , planett(4)%p(2) ,"(m/s)"
+    write(*,"(a,f50.6,a)") " The position of the Earth is z: " , planett(4)%p(3) ,"(m/s)"
 
     write(*,"(a,f50.6)") " Vx Earth: " , planett(4)%velocity(1) 
     write(*,"(a,f50.6)") " Vy Earth: " , planett(4)%velocity(2)
